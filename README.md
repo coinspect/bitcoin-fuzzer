@@ -40,15 +40,21 @@ Aiming to test specific features of the RSK <> Bitcoin integration, we propose t
 
 ## Usage
 ```$ git clone https://github.com/coinspect/bitcoin-fuzzer.git```
+
 ```$ cd bitcoin-fuzzer```
+
 ```$ docker build -t bitcoin-fuzzer .```
 
 Once done building, open a terminal with the docker instance.
+
 Make edits to harnesses:
+
 ```$ cd /usr/src/bitcoin/src/test/fuzz```
 
 Run fuzz targets with provided seed input:
+
 ```$ cd /usr/src/bitcoin/test/fuzz```
+
 ```./test_runner.py --corpus_dir ./json-input --target script```
 
 
