@@ -33,6 +33,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
+
 typedef std::basic_string <unsigned char> ustring;
 
 std::vector<unsigned char> CheckedParseHex(const std::string& str)
@@ -72,14 +73,6 @@ std::string checkTrueOrFalse(bool value)
 	return value ? "true" : "false";
 } 
 
-void initialize_script()
-{
-    // Fuzzers using pubkey must hold an ECCVerifyHandle.
-    static const ECCVerifyHandle verify_handle;
-
-    SelectParams(CBaseChainParams::REGTEST);
-}
-
 void check_type(TxoutType which_type)
 {
 	if (which_type == TxoutType::NONSTANDARD)
@@ -104,6 +97,43 @@ void check_type(TxoutType which_type)
 		std::cout << "    Type :: WITNESS_UNKNOWN" << "\n";
 }
 
+void VALIDATE_SCRIPT(std::string unlockScript, std::string lockScript)
+{
+	CScript scriptSig_input = ScriptFromHex(unlockScript);
+	CScript scriptPubKey_input = ScriptFromHex(lockScript);
+	TxoutType which_type;
+
+	if (scriptPubKey_input.GetSigOpCount(scriptSig_input) > MAX_P2SH_SIGOPS) {
+			std::cout << std::endl;
+			std::cout << "NON-STANDARD SCRIPT" << std::endl;
+			std::cout << std::endl;
+			std::cout << "  scriptPuKey :: " << (scriptPubKey_input.size()) << std::endl;
+ 			std::cout << "    IsStandard :: " << checkTrueOrFalse(IsStandard(scriptPubKey_input, std::nullopt, which_type)) << std::endl;
+			std::cout << "    IsPayToScriptHash :: " << checkTrueOrFalse(scriptPubKey_input.IsPayToScriptHash()) << std::endl;
+			check_type(which_type);
+			std::cout << lockScript << std::endl;
+			std::cout << std::endl;
+			std::cout << "  scriptSig :: " << (scriptSig_input.size()) << std::endl;
+			std::cout << "    GetSigOpCount :: " << scriptPubKey_input.GetSigOpCount(scriptSig_input) << std::endl;
+			std::cout << "    AreInputsStandard::GetSigOpCount(true) < MAX_P2SH_SIGOPS :: " << \
+				checkTrueOrFalse(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS);
+			std::cout << std::endl;
+			check_type(which_type);
+			std::cout << unlockScript << std::endl;
+			std::cout << std::endl << std::endl;
+		}
+
+		assert(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS);
+}
+
+void initialize_script()
+{
+    // Fuzzers using pubkey must hold an ECCVerifyHandle.
+    static const ECCVerifyHandle verify_handle;
+
+    SelectParams(CBaseChainParams::REGTEST);
+}
+
 
 FUZZ_TARGET_INIT(script, initialize_script)
 {
@@ -116,9 +146,6 @@ FUZZ_TARGET_INIT(script, initialize_script)
 	std::string input = std::string(reinterpret_cast<const std::string::value_type *>(buffer.begin()), (buffer.size()));
 
 	std::vector <std::string> scripts;
-
-	CScript scriptSig_input;
-	CScript scriptPubKey_input;
 	TxoutType which_type;
 
 	std::string	unlockScriptToken = "\"script\":";
@@ -158,30 +185,7 @@ FUZZ_TARGET_INIT(script, initialize_script)
 			scripts.push_back(lockScript);
 		}
 
-		scriptSig_input = ScriptFromHex(unlockScript);
-		scriptPubKey_input = ScriptFromHex(lockScript);
-
-		if (scriptPubKey_input.GetSigOpCount(scriptSig_input) > MAX_P2SH_SIGOPS) {
-			std::cout << std::endl;
-			std::cout << "NON-STANDARD SCRIPT" << std::endl;
-			std::cout << std::endl;
-			std::cout << "  scriptPuKey :: " << (scriptPubKey_input.size()) << std::endl;
- 			std::cout << "    IsStandard :: " << checkTrueOrFalse(IsStandard(scriptPubKey_input, std::nullopt, which_type)) << std::endl;
-			std::cout << "    IsPayToScriptHash :: " << checkTrueOrFalse(scriptPubKey_input.IsPayToScriptHash()) << std::endl;
-			check_type(which_type);
-			std::cout << lockScript << std::endl;
-			std::cout << std::endl;
-			std::cout << "  scriptSig :: " << (scriptSig_input.size()) << std::endl;
-			std::cout << "    GetSigOpCount :: " << scriptPubKey_input.GetSigOpCount(scriptSig_input) << std::endl;
-			std::cout << "    AreInputsStandard::GetSigOpCount(true) < MAX_P2SH_SIGOPS :: " << \
-				checkTrueOrFalse(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS);
-			std::cout << std::endl;
-			check_type(which_type);
-			std::cout << unlockScript << std::endl;
-			std::cout << std::endl << std::endl;
-		}
-
-		assert(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS);
+		VALIDATE_SCRIPT(unlockScript, lockScript);
 
 		num++;
 	}
