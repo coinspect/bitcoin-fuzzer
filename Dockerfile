@@ -3,9 +3,6 @@ FROM ubuntu:22.04
 
 EXPOSE 8332 8333
 
-# Compile Bitcoin, uninstall dev packages after compilation
-ARG VERSION=v0.21.0
-ARG MAKE_JOBS=1
 ARG BASIC_PACKAGES="build-essential libtool autotools-dev automake pkg-config python3 git wget ca-certificates libssl-dev libevent-dev libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-thread-dev libboost-program-options-dev "
 ARG FUZZER_PACKAGES="clang llvm libfuzzer-13-dev"
 ARG OPTIONAL_PACKAGES="vim zsh"
