@@ -43,21 +43,27 @@ Aiming to resolve **unstructured input**, we propose the following workflow:
 3. Iterate over inputs performing checks and validation logics defined by the user
 
 ## Usage
-```$ git clone https://github.com/coinspect/bitcoin-fuzzer.git```
 
-```$ cd bitcoin-fuzzer```
+``` sh
+$ git clone https://github.com/coinspect/bitcoin-fuzzer
+$ cd bitcoin-fuzzer
+$ docker build -t bitcoin-fuzzer .
 
-```$ docker build -t bitcoin-fuzzer .```
+# we will now build the volume with inputs for bitcoind to run
+$ mkdir inputs; mkdir inputs/script
 
-Once done building, open a terminal with the docker instance.
+# $INPUTS is a JSON file with testcases
+$ cp $INPUTS inputs/inputs.json 
+$ cd inputs/script
 
-Make edits to harnesses:
+# we need to split the input file because of the buffer size of 
+# the C code
+$ jq -c '.[]' ../inputs.json | split -l 100 
 
-```$ cd /usr/src/bitcoin/src/test/fuzz```
+$ cd ../.. # back to project root folder
+$ docker run -it -v $PWD/inputs/:/inputs bitcoin-fuzzer /bin/bash
 
-Run fuzz targets with provided seed input:
-
-```$ cd /usr/src/bitcoin/test/fuzz```
-
-```$ ./test_runner.py --corpus_dir ./json-input --target script```
-
+# you are now inside the docker container
+> cd /usr/bitcoin/test/fuzz 
+> ./test-runner.py --corpus_dir /inputs --target script
+```
