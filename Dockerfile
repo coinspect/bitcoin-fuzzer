@@ -21,5 +21,5 @@ COPY $COINSPECT_FUZZER_PACKAGE/ $BITCOIN_PATH
 RUN cd $BITCOIN_PATH && \
 	./autogen.sh && \
 	CC=clang CXX=clang++ ./configure --enable-fuzz --with-sanitizers=address,fuzzer,undefined && \
-	make
+	make -j "$(($(nproc)+1))"
 
