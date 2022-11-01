@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 
 EXPOSE 8332 8333
 
-ARG BASIC_PACKAGES="build-essential libtool autotools-dev automake pkg-config python3 git wget ca-certificates libssl-dev libevent-dev libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-thread-dev libboost-program-options-dev "
+ARG BASIC_PACKAGES="build-essential libtool autotools-dev automake pkg-config python3 git wget ca-certificates libssl-dev libevent-dev libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-thread-dev libboost-program-options-dev ccache"
 ARG FUZZER_PACKAGES="clang llvm libfuzzer-13-dev"
 ARG OPTIONAL_PACKAGES="vim zsh"
 ARG BITCOIN_PATH="/usr/src/bitcoin"
