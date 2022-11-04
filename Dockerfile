@@ -20,6 +20,6 @@ COPY $COINSPECT_FUZZER_PACKAGE/ $BITCOIN_PATH
 
 RUN cd $BITCOIN_PATH && \
 	./autogen.sh && \
-	CC=clang CXX=clang++ ./configure --enable-fuzz --with-sanitizers=address,fuzzer,undefined && \
+	CC=clang CXX=clang++ ./configure --enable-fuzz --with-sanitizers=address,fuzzer,undefined,signed-integer-overflow,unsigned-integer-overflow && \
 	make -j "$(($(nproc)+1))"
 
