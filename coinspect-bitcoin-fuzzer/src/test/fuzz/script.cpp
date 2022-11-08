@@ -17,11 +17,16 @@
 #include <script/sign.h>
 #include <script/signingprovider.h>
 #include <script/standard.h>
+
 #include <streams.h>
 #include <test/fuzz/FuzzedDataProvider.h>
 #include <test/fuzz/fuzz.h>
 #include <test/fuzz/util.h>
 #include <univalue.h>
+
+#include <test/util/transaction_utils.h>
+#include <util/strencodings.h>
+#include <test/data/script_tests.json.h>
 
 #include <algorithm>
 #include <cassert>
@@ -34,21 +39,86 @@
 #include <stdio.h>
 
 
+std::string FormatScriptFlags(unsigned int flags);
 typedef std::basic_string <unsigned char> ustring;
 
-std::vector<unsigned char> CheckedParseHex(const std::string& str)
-{   
-	if (str.size() && !IsHex(str)) throw std::runtime_error("Non-hex input '" + str + "'");
-	return ParseHex(str);
-}
+static std::map<std::string, unsigned int> mapFlagNames = {
+    {std::string("P2SH"), (unsigned int)SCRIPT_VERIFY_P2SH},
+    {std::string("STRICTENC"), (unsigned int)SCRIPT_VERIFY_STRICTENC},
+    {std::string("DERSIG"), (unsigned int)SCRIPT_VERIFY_DERSIG},
+    {std::string("LOW_S"), (unsigned int)SCRIPT_VERIFY_LOW_S},
+    {std::string("SIGPUSHONLY"), (unsigned int)SCRIPT_VERIFY_SIGPUSHONLY},
+    {std::string("MINIMALDATA"), (unsigned int)SCRIPT_VERIFY_MINIMALDATA},
+    {std::string("NULLDUMMY"), (unsigned int)SCRIPT_VERIFY_NULLDUMMY},
+    {std::string("DISCOURAGE_UPGRADABLE_NOPS"), (unsigned int)SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS},
+    {std::string("CLEANSTACK"), (unsigned int)SCRIPT_VERIFY_CLEANSTACK},
+    {std::string("MINIMALIF"), (unsigned int)SCRIPT_VERIFY_MINIMALIF},
+    {std::string("NULLFAIL"), (unsigned int)SCRIPT_VERIFY_NULLFAIL},
+    {std::string("CHECKLOCKTIMEVERIFY"), (unsigned int)SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY},
+    {std::string("CHECKSEQUENCEVERIFY"), (unsigned int)SCRIPT_VERIFY_CHECKSEQUENCEVERIFY},
+    {std::string("WITNESS"), (unsigned int)SCRIPT_VERIFY_WITNESS},
+    {std::string("DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM"), (unsigned int)SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM},
+    {std::string("WITNESS_PUBKEYTYPE"), (unsigned int)SCRIPT_VERIFY_WITNESS_PUBKEYTYPE},
+    {std::string("CONST_SCRIPTCODE"), (unsigned int)SCRIPT_VERIFY_CONST_SCRIPTCODE},
+    {std::string("TAPROOT"), (unsigned int)SCRIPT_VERIFY_TAPROOT},
+    {std::string("DISCOURAGE_UPGRADABLE_PUBKEYTYPE"), (unsigned int)SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_PUBKEYTYPE},
+    {std::string("DISCOURAGE_OP_SUCCESS"), (unsigned int)SCRIPT_VERIFY_DISCOURAGE_OP_SUCCESS},
+    {std::string("DISCOURAGE_UPGRADABLE_TAPROOT_VERSION"), (unsigned int)SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_TAPROOT_VERSION},
+};
 
-CScript ScriptFromHex(const std::string& str)
-{   
-	std::vector<unsigned char> data = CheckedParseHex(str);
-	return CScript(data.begin(), data.end());
-}
+struct ScriptErrorDesc
+{
+    ScriptError_t err;
+    const char *name;
+};
 
-void hexdump(const unsigned char *ptr, int buflen)
+static ScriptErrorDesc script_errors[]={
+    {SCRIPT_ERR_OK, "OK"},
+    {SCRIPT_ERR_UNKNOWN_ERROR, "UNKNOWN_ERROR"},
+    {SCRIPT_ERR_EVAL_FALSE, "EVAL_FALSE"},
+    {SCRIPT_ERR_OP_RETURN, "OP_RETURN"},
+    {SCRIPT_ERR_SCRIPT_SIZE, "SCRIPT_SIZE"},
+    {SCRIPT_ERR_PUSH_SIZE, "PUSH_SIZE"},
+    {SCRIPT_ERR_OP_COUNT, "OP_COUNT"},
+    {SCRIPT_ERR_STACK_SIZE, "STACK_SIZE"},
+    {SCRIPT_ERR_SIG_COUNT, "SIG_COUNT"},
+    {SCRIPT_ERR_PUBKEY_COUNT, "PUBKEY_COUNT"},
+    {SCRIPT_ERR_VERIFY, "VERIFY"},
+    {SCRIPT_ERR_EQUALVERIFY, "EQUALVERIFY"},
+    {SCRIPT_ERR_CHECKMULTISIGVERIFY, "CHECKMULTISIGVERIFY"},
+    {SCRIPT_ERR_CHECKSIGVERIFY, "CHECKSIGVERIFY"},
+    {SCRIPT_ERR_NUMEQUALVERIFY, "NUMEQUALVERIFY"},
+    {SCRIPT_ERR_BAD_OPCODE, "BAD_OPCODE"},
+    {SCRIPT_ERR_DISABLED_OPCODE, "DISABLED_OPCODE"},
+    {SCRIPT_ERR_INVALID_STACK_OPERATION, "INVALID_STACK_OPERATION"},
+    {SCRIPT_ERR_INVALID_ALTSTACK_OPERATION, "INVALID_ALTSTACK_OPERATION"},
+    {SCRIPT_ERR_UNBALANCED_CONDITIONAL, "UNBALANCED_CONDITIONAL"},
+    {SCRIPT_ERR_NEGATIVE_LOCKTIME, "NEGATIVE_LOCKTIME"},
+    {SCRIPT_ERR_UNSATISFIED_LOCKTIME, "UNSATISFIED_LOCKTIME"},
+    {SCRIPT_ERR_SIG_HASHTYPE, "SIG_HASHTYPE"},
+    {SCRIPT_ERR_SIG_DER, "SIG_DER"},
+    {SCRIPT_ERR_MINIMALDATA, "MINIMALDATA"},
+    {SCRIPT_ERR_SIG_PUSHONLY, "SIG_PUSHONLY"},
+    {SCRIPT_ERR_SIG_HIGH_S, "SIG_HIGH_S"},
+    {SCRIPT_ERR_SIG_NULLDUMMY, "SIG_NULLDUMMY"},
+    {SCRIPT_ERR_PUBKEYTYPE, "PUBKEYTYPE"},
+    {SCRIPT_ERR_CLEANSTACK, "CLEANSTACK"},
+    {SCRIPT_ERR_MINIMALIF, "MINIMALIF"},
+    {SCRIPT_ERR_SIG_NULLFAIL, "NULLFAIL"},
+    {SCRIPT_ERR_DISCOURAGE_UPGRADABLE_NOPS, "DISCOURAGE_UPGRADABLE_NOPS"},
+    {SCRIPT_ERR_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM, "DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM"},
+    {SCRIPT_ERR_WITNESS_PROGRAM_WRONG_LENGTH, "WITNESS_PROGRAM_WRONG_LENGTH"},
+    {SCRIPT_ERR_WITNESS_PROGRAM_WITNESS_EMPTY, "WITNESS_PROGRAM_WITNESS_EMPTY"},
+    {SCRIPT_ERR_WITNESS_PROGRAM_MISMATCH, "WITNESS_PROGRAM_MISMATCH"},
+    {SCRIPT_ERR_WITNESS_MALLEATED, "WITNESS_MALLEATED"},
+    {SCRIPT_ERR_WITNESS_MALLEATED_P2SH, "WITNESS_MALLEATED_P2SH"},
+    {SCRIPT_ERR_WITNESS_UNEXPECTED, "WITNESS_UNEXPECTED"},
+    {SCRIPT_ERR_WITNESS_PUBKEYTYPE, "WITNESS_PUBKEYTYPE"},
+    {SCRIPT_ERR_OP_CODESEPARATOR, "OP_CODESEPARATOR"},
+    {SCRIPT_ERR_SIG_FINDANDDELETE, "SIG_FINDANDDELETE"},
+};
+
+void Hexdump(const unsigned char *ptr, int buflen)
 {
 	unsigned char	*buf = (unsigned char*) ptr;
 	int				i, j;
@@ -73,14 +143,62 @@ std::string checkTrueOrFalse(bool value)
 	return value ? "true" : "false";
 } 
 
-void check_type(TxoutType which_type)
+unsigned int ParseScriptFlags(std::string strFlags)
+{
+    if (strFlags.empty() || strFlags == "NONE") return 0;
+    unsigned int flags = 0;
+    std::vector<std::string> words = SplitString(strFlags, ',');
+
+    for (const std::string& word : words)
+    {
+        if (!mapFlagNames.count(word))
+            std::cout << "Bad test: unknown verification flag '" << word << "'" << std::endl;
+        flags |= mapFlagNames[word];
+    }
+
+    return flags;
+}
+
+std::vector<unsigned char> CheckedParseHex(const std::string& str)
+{   
+	if (str.size() && !IsHex(str)) throw std::runtime_error("Non-hex input '" + str + "'");
+	return ParseHex(str);
+}
+
+static std::string FormatScriptError(ScriptError_t err)
+{
+    for (const auto& se : script_errors) {
+        if (se.err == err)
+            return se.name;
+	}
+	std::cout << "Unknown scripterror enumeration value, update script_errors in script_tests.cpp." << std::endl;
+    return "";
+}
+
+static ScriptError_t ParseScriptError(const std::string& name)
+{
+    for (const auto& se : script_errors) {
+        if (se.name == name)
+            return se.err;
+	}
+	std::cout << "Unknown scripterror \"" << name << "\" in test description" << std::endl;
+    return SCRIPT_ERR_UNKNOWN_ERROR;
+}
+
+CScript ScriptFromHex(const std::string& str)
+{   
+	std::vector<unsigned char> data = CheckedParseHex(str);
+	return CScript(data.begin(), data.end());
+}
+
+void checkType(TxoutType which_type)
 {
 	if (which_type == TxoutType::NONSTANDARD)
-		 std::cout << "   Type :: NONSTANDARD" << "\n";
+		std::cout << "    Type :: NONSTANDARD" << "\n";
 	if (which_type == TxoutType::NULL_DATA)
 		std::cout << "    Type :: NULL_DATA" << "\n";
 	if (which_type == TxoutType::MULTISIG)
-		 std::cout << "   Type :: MULTISIG" << "\n";
+		std::cout << "    Type :: MULTISIG" << "\n";
 	if (which_type == TxoutType::PUBKEY)
 		std::cout << "    Type :: PUBKEY" << "\n";
 	if (which_type == TxoutType::PUBKEYHASH)
@@ -97,33 +215,47 @@ void check_type(TxoutType which_type)
 		std::cout << "    Type :: WITNESS_UNKNOWN" << "\n";
 }
 
-void VALIDATE_SCRIPT(std::string unlockScript, std::string lockScript)
+UniValue read_json(const std::string& jsondata)
 {
-	CScript scriptSig_input = ScriptFromHex(unlockScript);
-	CScript scriptPubKey_input = ScriptFromHex(lockScript);
-	TxoutType which_type;
+    UniValue v;
 
-	if (scriptPubKey_input.GetSigOpCount(scriptSig_input) > MAX_P2SH_SIGOPS) {
-			std::cout << std::endl;
-			std::cout << "NON-STANDARD SCRIPT" << std::endl;
-			std::cout << std::endl;
-			std::cout << "  scriptPuKey :: " << (scriptPubKey_input.size()) << std::endl;
- 			std::cout << "    IsStandard :: " << checkTrueOrFalse(IsStandard(scriptPubKey_input, std::nullopt, which_type)) << std::endl;
-			std::cout << "    IsPayToScriptHash :: " << checkTrueOrFalse(scriptPubKey_input.IsPayToScriptHash()) << std::endl;
-			check_type(which_type);
-			std::cout << lockScript << std::endl;
-			std::cout << std::endl;
-			std::cout << "  scriptSig :: " << (scriptSig_input.size()) << std::endl;
-			std::cout << "    GetSigOpCount :: " << scriptPubKey_input.GetSigOpCount(scriptSig_input) << std::endl;
-			std::cout << "    AreInputsStandard::GetSigOpCount(true) < MAX_P2SH_SIGOPS :: " << \
-				checkTrueOrFalse(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS);
-			std::cout << std::endl;
-			check_type(which_type);
-			std::cout << unlockScript << std::endl;
-			std::cout << std::endl << std::endl;
-		}
+    if (!v.read(jsondata) || !v.isArray())
+    {   
+		std::cout << "Parse error." << std::endl;
+        return UniValue(UniValue::VARR);
+    }
+    return v.get_array();
+}
 
-		assert(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS);
+void PRINT_SCRIPTS_SUMMARY(CScript scriptSig_input, CScript scriptPubKey_input)
+{
+    TxoutType which_type;
+
+	std::cout << std::endl;
+	std::cout << "NON-STANDARD SCRIPT" << std::endl;
+	std::cout << std::endl;
+	std::cout << "  scriptPuKey :: " << (scriptPubKey_input.size()) << std::endl;
+	std::cout << "    IsStandard :: " << checkTrueOrFalse(IsStandard(scriptPubKey_input, std::nullopt, which_type)) << std::endl;
+	std::cout << "    IsPayToScriptHash :: " << checkTrueOrFalse(scriptPubKey_input.IsPayToScriptHash()) << std::endl;
+	checkType(which_type);
+	std::cout << "    HEX :: " << HexStr(scriptPubKey_input) << std::endl;
+	std::cout << "    ASM :: " << ScriptToAsmStr(scriptPubKey_input, false) << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "  scriptSig :: " << (scriptSig_input.size()) << std::endl;
+	std::cout << "    GetSigOpCount :: " << scriptPubKey_input.GetSigOpCount(scriptSig_input) << std::endl;
+	std::cout << "    AreInputsStandard::GetSigOpCount(true) < MAX_P2SH_SIGOPS :: " << \
+		checkTrueOrFalse(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS) << std::endl;
+#if PEGFIX_PATCH
+	// Sergio's patch to script parser
+	std::size_t sigOpCount = scriptSig_input.GetStandardSigOpCount();
+	std::cout << "    GetStandardSigOpCount == " << sigOpCount;
+	std::cout << std::endl;
+#endif
+	checkType(which_type);
+	std::cout << "    HEX :: " << HexStr(scriptSig_input) << std::endl;
+	std::cout << "    ASM :: " << ScriptToAsmStr(scriptSig_input, true) << std::endl;
+	std::cout << std::endl << std::endl;
 }
 
 void initialize_script()
@@ -134,20 +266,16 @@ void initialize_script()
     SelectParams(CBaseChainParams::REGTEST);
 }
 
-
 FUZZ_TARGET_INIT(script, initialize_script)
 {
-#if 0
-	std::cout << "\n\n";
-	printf("Input :: %u", (unsigned int) buffer.size());
-	std::cout << "\n";
-	hexdump(buffer.data(), buffer.size());
-#endif
 	std::string input = std::string(reinterpret_cast<const std::string::value_type *>(buffer.begin()), (buffer.size()));
-
 	std::vector <std::string> scripts;
-	TxoutType which_type;
 
+	TxoutType which_type;
+	std::size_t count = 0;
+
+#if BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
+	// Old parser
 	std::string	unlockScriptToken = "\"script\":";
 	std::string lockScriptToken = "\"lockScript\":";
 	std::string delimiter = "\",";
@@ -185,11 +313,68 @@ FUZZ_TARGET_INIT(script, initialize_script)
 			scripts.push_back(lockScript);
 		}
 
-		VALIDATE_SCRIPT(unlockScript, lockScript);
+		PRINT_SCRIPTS_SUMMARY(unlockScript, lockScript);
 
 		num++;
 	}
+#else
+    // Read tests from test/data/script_tests.json
+    // Format is an array of arrays
+    // Inner arrays are [ ["wit"..., nValue]?, "scriptSig", "scriptPubKey", "flags", "expected_scripterror" ]
+    // ... where scriptSig and scriptPubKey are stringified
+    // scripts.
+    // If a witness is given, then the last value in the array should be the
+    // amount (nValue) to use in the crediting tx
+    UniValue tests = read_json(std::string(json_tests::script_tests, json_tests::script_tests + sizeof(json_tests::script_tests)));
 
+    for (unsigned int idx = 0; idx < tests.size(); idx++) {
+        const UniValue& test = tests[idx];
+        std::string strTest = test.write();
+        CScriptWitness witness;
+        std::string strWitness;
+        CAmount nValue = 0;
+        unsigned int pos = 0;
+        if (test.size() > 0 && test[pos].isArray()) {
+            unsigned int i=0;
+            for (i = 0; i < test[pos].size()-1; i++) {
+                witness.stack.push_back(ParseHex(test[pos][i].get_str()));
+                strWitness = test[pos][i].get_str();
+            }
+            nValue = AmountFromValue(test[pos][i]);
+            pos++;
+        }
+        if (test.size() < 4 + pos) // Allow size > 3; extra stuff ignored (useful for comments)
+        {   
+            if (test.size() != 1) {
+				std::cout << "Bad test: " << strTest << std::endl;
+            }
+            continue;
+        }
+		// BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
+        std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
+        std::cout << std::endl;
+        std::cout << "JSON INPUT" << std::endl << std::endl;
+		std::cout << "amount :: " << nValue << std::endl;
+        std::cout << "witness :: " << strWitness << std::endl;
+        std::string scriptSigString = test[pos++].get_str();
+        std::cout << "scriptSig :: " << scriptSigString << std::endl;
+        std::string scriptPubKeyString = test[pos++].get_str();
+        std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
+
+        CScript scriptSig = ParseScript(scriptSigString);
+        CScript scriptPubKey = ParseScript(scriptPubKeyString);
+
+		std::string strScriptflags = test[pos].get_str();
+        unsigned int scriptflags = ParseScriptFlags(test[pos++].get_str());
+		std::cout << "flags :: " << strScriptflags << " | " << scriptflags << std::endl;
+
+		std::string strScriptError = test[pos].get_str();
+        int scriptError = ParseScriptError(test[pos++].get_str());
+		std::cout << "error :: " << strScriptError << " | " << scriptError << std::endl;
+
+        PRINT_SCRIPTS_SUMMARY(scriptSig, scriptPubKey);
+    }
+#endif
 
     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());
     const CScript script{ConsumeScript(fuzzed_data_provider)};
