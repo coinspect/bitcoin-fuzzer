@@ -1,4 +1,3 @@
-
 FROM ubuntu:22.04
 
 EXPOSE 8332 8333
