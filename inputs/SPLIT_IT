@@ -1,9 +1,0 @@
-#!/usr/bin/env zsh
-
-BASEDIR=$(dirname $0);
-INPUTNAME=$1;
-
-TARGET_DIR="$BASEDIR/$INPUTNAME_split";
-mkdir $TARGET_DIR
-cd $TARGET_DIR
-jq -c '.[]' "$BASEDIR/inputs/$INPUTNAME" | split -l 100
