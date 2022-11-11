@@ -5,6 +5,7 @@
 #include <test/data/script_tests.json.h>
 #include <test/data/bip341_wallet_vectors.json.h>
 
+// BITCOIN-FUZZER input
 #include <test/data/deprecated_ERP_scripts.json.h>
 #include <test/data/new_ERP_scripts.json.h>
 #include <test/data/scripts_fastbridge.json.h>
