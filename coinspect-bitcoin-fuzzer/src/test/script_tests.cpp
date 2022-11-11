@@ -60,31 +60,31 @@ std::string FormatScriptFlags(unsigned int flags);
 
 std::string checkTrueOrFalse(bool value)
 {
-	return value ? "true" : "false";
+    return value ? "true" : "false";
 } 
 
 void checkType(TxoutType which_type)
 {
-	if (which_type == TxoutType::NONSTANDARD)
-		std::cout << "    Type :: NONSTANDARD" << "\n";
-	if (which_type == TxoutType::NULL_DATA)
-		std::cout << "    Type :: NULL_DATA" << "\n";
-	if (which_type == TxoutType::MULTISIG)
-		std::cout << "    Type :: MULTISIG" << "\n";
-	if (which_type == TxoutType::PUBKEY)
-		std::cout << "    Type :: PUBKEY" << "\n";
-	if (which_type == TxoutType::PUBKEYHASH)
-		std::cout << "    Type :: PUBKEYHASH" << "\n";
-	if (which_type == TxoutType::SCRIPTHASH)
-		std::cout << "    Type :: SCRIPTHASH" << "\n";
-	if (which_type == TxoutType::WITNESS_V0_SCRIPTHASH)
-		std::cout << "    Type :: WITNESS_V0_SCRIPTHASH" << "\n";
-	if (which_type == TxoutType::WITNESS_V0_KEYHASH)
-		std::cout << "    Type :: WITNESS_V0_KEYHASH" << "\n";
-	if (which_type == TxoutType::WITNESS_V1_TAPROOT)
-		std::cout << "    Type :: WITNESS_V1_TAPROOT" << "\n";
-	if (which_type == TxoutType::WITNESS_UNKNOWN)
-		std::cout << "    Type :: WITNESS_UNKNOWN" << "\n";
+    if (which_type == TxoutType::NONSTANDARD)
+        std::cout << "    Type :: NONSTANDARD" << "\n";
+    if (which_type == TxoutType::NULL_DATA)
+        std::cout << "    Type :: NULL_DATA" << "\n";
+    if (which_type == TxoutType::MULTISIG)
+        std::cout << "    Type :: MULTISIG" << "\n";
+    if (which_type == TxoutType::PUBKEY)
+        std::cout << "    Type :: PUBKEY" << "\n";
+    if (which_type == TxoutType::PUBKEYHASH)
+        std::cout << "    Type :: PUBKEYHASH" << "\n";
+    if (which_type == TxoutType::SCRIPTHASH)
+        std::cout << "    Type :: SCRIPTHASH" << "\n";
+    if (which_type == TxoutType::WITNESS_V0_SCRIPTHASH)
+        std::cout << "    Type :: WITNESS_V0_SCRIPTHASH" << "\n";
+    if (which_type == TxoutType::WITNESS_V0_KEYHASH)
+        std::cout << "    Type :: WITNESS_V0_KEYHASH" << "\n";
+    if (which_type == TxoutType::WITNESS_V1_TAPROOT)
+        std::cout << "    Type :: WITNESS_V1_TAPROOT" << "\n";
+    if (which_type == TxoutType::WITNESS_UNKNOWN)
+        std::cout << "    Type :: WITNESS_UNKNOWN" << "\n";
 }
 
 static CScript ScriptFromHex(const std::string& str)
@@ -96,33 +96,33 @@ static CScript ScriptFromHex(const std::string& str)
 
 void PRINT_SCRIPTS_SUMMARY(CScript scriptSig_input, CScript scriptPubKey_input)
 {
-	TxoutType which_type;
+    TxoutType which_type;
 
-	std::cout << std::endl;
-	std::cout << "NON-STANDARD SCRIPT" << std::endl;
-	std::cout << std::endl;
-	std::cout << "  scriptPuKey :: " << (scriptPubKey_input.size()) << std::endl;
- 	std::cout << "    IsStandard :: " << checkTrueOrFalse(IsStandard(scriptPubKey_input, std::nullopt, which_type)) << std::endl;
-	std::cout << "    IsPayToScriptHash :: " << checkTrueOrFalse(scriptPubKey_input.IsPayToScriptHash()) << std::endl;
-	checkType(which_type);
-	std::cout << "    HEX :: " << HexStr(scriptPubKey_input) << std::endl;
-	std::cout << "    ASM :: " << ScriptToAsmStr(scriptPubKey_input, false) << std::endl;
-	std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "NON-STANDARD SCRIPT" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  scriptPuKey :: " << (scriptPubKey_input.size()) << std::endl;
+    std::cout << "    IsStandard :: " << checkTrueOrFalse(IsStandard(scriptPubKey_input, std::nullopt, which_type)) << std::endl;
+    std::cout << "    IsPayToScriptHash :: " << checkTrueOrFalse(scriptPubKey_input.IsPayToScriptHash()) << std::endl;
+    checkType(which_type);
+    std::cout << "    HEX :: " << HexStr(scriptPubKey_input) << std::endl;
+    std::cout << "    ASM :: " << ScriptToAsmStr(scriptPubKey_input, false) << std::endl;
+    std::cout << std::endl;
 
-	std::cout << "  scriptSig :: " << (scriptSig_input.size()) << std::endl;
-	std::cout << "    GetSigOpCount :: " << scriptPubKey_input.GetSigOpCount(scriptSig_input) << std::endl;
-	std::cout << "    AreInputsStandard::GetSigOpCount(true) < MAX_P2SH_SIGOPS :: " << \
-		checkTrueOrFalse(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS) << std::endl;
+    std::cout << "  scriptSig :: " << (scriptSig_input.size()) << std::endl;
+    std::cout << "    GetSigOpCount :: " << scriptPubKey_input.GetSigOpCount(scriptSig_input) << std::endl;
+    std::cout << "    AreInputsStandard::GetSigOpCount(true) < MAX_P2SH_SIGOPS :: " << \
+        checkTrueOrFalse(scriptPubKey_input.GetSigOpCount(scriptSig_input) < MAX_P2SH_SIGOPS) << std::endl;
 #ifdef PEGFIX_PATCH
-	// Pegfix patch to script parser
-	std::size_t sigOpCount = scriptSig_input.GetStandardSigOpCount();
-	std::cout << "    GetStandardSigOpCount == " << sigOpCount;
-	std::cout << std::endl;
+    // Pegfix patch to script parser
+    std::size_t sigOpCount = scriptSig_input.GetStandardSigOpCount();
+    std::cout << "    GetStandardSigOpCount == " << sigOpCount;
+    std::cout << std::endl;
 #endif
-	checkType(which_type);
-	std::cout << "    HEX :: " << HexStr(scriptSig_input) << std::endl;
-	std::cout << "    ASM :: " << ScriptToAsmStr(scriptSig_input, true) << std::endl;
-	std::cout << std::endl << std::endl;
+    checkType(which_type);
+    std::cout << "    HEX :: " << HexStr(scriptSig_input) << std::endl;
+    std::cout << "    ASM :: " << ScriptToAsmStr(scriptSig_input, true) << std::endl;
+    std::cout << std::endl << std::endl;
 }
 
 UniValue read_json(const std::string& jsondata)
@@ -986,7 +986,6 @@ BOOST_AUTO_TEST_CASE(script_build)
     {
         UniValue json_tests = read_json(std::string(json_tests::script_tests, json_tests::script_tests + sizeof(json_tests::script_tests)));
 
-		std::cout << "JSON SIZE :: " << json_tests.size() << std::endl;
         for (unsigned int idx = 0; idx < json_tests.size(); idx++) {
             const UniValue& tv = json_tests[idx];
             tests_set.insert(JSONPrettyPrint(tv.get_array()));
@@ -1017,14 +1016,14 @@ BOOST_AUTO_TEST_CASE(script_build)
 
 BOOST_AUTO_TEST_CASE(script_json_test)
 {
-	// Read tests from test/data/script_tests.json
-	// Format is an array of arrays
-	// Inner arrays are [ ["wit"..., nValue]?, "scriptSig", "scriptPubKey", "flags", "expected_scripterror" ]
-	// ... where scriptSig and scriptPubKey are stringified
-	// scripts.
-	// If a witness is given, then the last value in the array should be the
-	// amount (nValue) to use in the crediting tx
-	UniValue tests = read_json(std::string(json_tests::script_tests, json_tests::script_tests + sizeof(json_tests::script_tests)));
+    // Read tests from test/data/script_tests.json
+    // Format is an array of arrays
+    // Inner arrays are [ ["wit"..., nValue]?, "scriptSig", "scriptPubKey", "flags", "expected_scripterror" ]
+    // ... where scriptSig and scriptPubKey are stringified
+    // scripts.
+    // If a witness is given, then the last value in the array should be the
+    // amount (nValue) to use in the crediting tx
+    UniValue tests = read_json(std::string(json_tests::script_tests, json_tests::script_tests + sizeof(json_tests::script_tests)));
 
     for (unsigned int idx = 0; idx < tests.size(); idx++) {
         const UniValue& test = tests[idx];
@@ -1033,7 +1032,8 @@ BOOST_AUTO_TEST_CASE(script_json_test)
         CAmount nValue = 0;
         unsigned int pos = 0;
         if (test.size() > 0 && test[pos].isArray()) {
-            unsigned int i=0;
+            unsigned int i = 0;
+
             for (i = 0; i < test[pos].size()-1; i++) {
                 witness.stack.push_back(ParseHex(test[pos][i].get_str()));
             }
@@ -1068,52 +1068,52 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
     // If a witness is given, then the last value in the array should be the
     // amount (nValue) to use in the crediting tx
     UniValue	tests = read_json(std::string(json_tests::deprecated_ERP_scripts, json_tests::deprecated_ERP_scripts + \
-						sizeof(json_tests::deprecated_ERP_scripts)));
-	std::size_t	count = 0;
+                sizeof(json_tests::deprecated_ERP_scripts)));
+    std::size_t	count = 0;
 
 #ifdef BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
-	// Old parser
-	std::string	unlockScriptToken = "\"script\":";
-	std::string lockScriptToken = "\"lockScript\":";
-	std::string delimiter = "\",";
+    // Old parser
+    std::string	unlockScriptToken = "\"script\":";
+    std::string lockScriptToken = "\"lockScript\":";
+    std::string delimiter = "\",";
 
-	std::size_t foundUnlockScript = 0;
-	std::size_t foundLockScript = 0;
-	size_t		pos = 0;
-	int			num = 0;
+    std::size_t foundUnlockScript = 0;
+    std::size_t foundLockScript = 0;
+    size_t		pos = 0;
+    int			num = 0;
 
-	while ((foundUnlockScript != std::string::npos) && (foundLockScript != std::string::npos)) {
-		std::string unlockScript;
-		std::string lockScript;
-		std::size_t len;
-		std::size_t offset;
+    while ((foundUnlockScript != std::string::npos) && (foundLockScript != std::string::npos)) {
+        std::string unlockScript;
+        std::string lockScript;
+        std::size_t len;
+        std::size_t offset;
 
-		foundUnlockScript = input.find(unlockScriptToken, pos);
-		pos = foundUnlockScript + unlockScriptToken.length();
-		foundLockScript = input.find(lockScriptToken, pos);
-		pos = foundLockScript + lockScriptToken.length();
+        foundUnlockScript = input.find(unlockScriptToken, pos);
+        pos = foundUnlockScript + unlockScriptToken.length();
+        foundLockScript = input.find(lockScriptToken, pos);
+        pos = foundLockScript + lockScriptToken.length();
 
-		if (foundUnlockScript != std::string::npos) {
-			offset = foundUnlockScript + unlockScriptToken.length() + 1;
-			pos = input.find(delimiter, offset);
-			len = pos - offset;
-			unlockScript = input.substr(offset, len);
+        if (foundUnlockScript != std::string::npos) {
+            offset = foundUnlockScript + unlockScriptToken.length() + 1;
+            pos = input.find(delimiter, offset);
+            len = pos - offset;
+            unlockScript = input.substr(offset, len);
 
-			scripts.push_back(unlockScript);
-		}
-		if (foundLockScript != std::string::npos) {
-			offset = foundLockScript + lockScriptToken.length() + 1;
-			pos = input.find(delimiter, offset);
-			len = pos - offset;
-			lockScript = input.substr(offset, len);
+            scripts.push_back(unlockScript);
+        }
+        if (foundLockScript != std::string::npos) {
+            offset = foundLockScript + lockScriptToken.length() + 1;
+            pos = input.find(delimiter, offset);
+            len = pos - offset;
+            lockScript = input.substr(offset, len);
 
-			scripts.push_back(lockScript);
-		}
+            scripts.push_back(lockScript);
+        }
 
-		PRINT_SCRIPTS_SUMMARY(unlockScript, lockScript);
+        PRINT_SCRIPTS_SUMMARY(unlockScript, lockScript);
 
-		num++;
-	}
+        num++;
+    }
 #else
     for (unsigned int idx = 0; idx < tests.size(); idx++) {
         const UniValue& test = tests[idx];
@@ -1123,13 +1123,14 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
         CAmount nValue = 0;
         unsigned int pos = 0;
 
-		count++;
+        count++;
 
         if (test.size() > 0 && test[pos].isArray()) {
-            unsigned int i=0;
+            unsigned int i = 0;
+            
             for (i = 0; i < test[pos].size()-1; i++) {
                 witness.stack.push_back(ParseHex(test[pos][i].get_str()));
-				strWitness = test[pos][i].get_str();
+                strWitness = test[pos][i].get_str();
             }
             nValue = AmountFromValue(test[pos][i]);
             pos++;
@@ -1149,37 +1150,37 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
         CScript scriptPubKey = ParseScript(scriptPubKeyString);
 
 #ifdef DEBUG_LOG_LEVEL
-		std::string strScriptflags = test[pos].get_str();
+        std::string strScriptflags = test[pos].get_str();
         unsigned int scriptflags = ParseScriptFlags(test[pos++].get_str());
 
 		std::string strScriptError = test[pos].get_str();
         int scriptError = ParseScriptError(test[pos++].get_str());
 
-		// BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
-		std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
-		std::cout << std::endl;
-		std::cout << "JSON INPUT" << std::endl << std::endl;
-		std::cout << "amount :: " << nValue << std::endl;
-		std::cout << "witness :: " << strWitness << std::endl;
-		std::cout << "scriptSig :: " << scriptSigString << std::endl;
-		std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
-		std::cout << "flags :: " << strScriptflags << " | " << scriptflags << std::endl;
-		std::cout << "error :: " << strScriptError << " | " << scriptError << std::endl;
-		std::cout << std::endl;
+        // BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
+        std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
+        std::cout << std::endl;
+        std::cout << "JSON INPUT" << std::endl << std::endl;
+        std::cout << "amount :: " << nValue << std::endl;
+        std::cout << "witness :: " << strWitness << std::endl;
+        std::cout << "scriptSig :: " << scriptSigString << std::endl;
+        std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
+        std::cout << "flags :: " << strScriptflags << " | " << scriptflags << std::endl;
+        std::cout << "error :: " << strScriptError << " | " << scriptError << std::endl;
+        std::cout << std::endl;
 #endif
 
-		if (scriptPubKey.GetSigOpCount(scriptSig) > MAX_P2SH_SIGOPS) {
-			std::vector<std::vector<unsigned char> > directStack;
-			ScriptError err;
+        if (scriptPubKey.GetSigOpCount(scriptSig) > MAX_P2SH_SIGOPS) {
+            std::vector<std::vector<unsigned char> > directStack;
+            ScriptError err;
 
-			PRINT_SCRIPTS_SUMMARY(scriptSig, scriptPubKey);
+            PRINT_SCRIPTS_SUMMARY(scriptSig, scriptPubKey);
 
-			EvalScript(directStack, scriptSig, SCRIPT_VERIFY_P2SH, BaseSignatureChecker(), SigVersion::BASE, &err);
-			if (err != SCRIPT_ERR_OK)
-				std::cout << "[!!!] Invalid script: " << ScriptErrorString(err) << std::endl;
-		}
+            EvalScript(directStack, scriptSig, SCRIPT_VERIFY_P2SH, BaseSignatureChecker(), SigVersion::BASE, &err);
+            if (err != SCRIPT_ERR_OK)
+                std::cout << "[!!!] Invalid script: " << ScriptErrorString(err) << std::endl;
+        }
 
-		BOOST_CHECK(scriptPubKey.GetSigOpCount(scriptSig) < MAX_P2SH_SIGOPS);
+        BOOST_CHECK(scriptPubKey.GetSigOpCount(scriptSig) < MAX_P2SH_SIGOPS);
     }
 #endif //BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
 }
@@ -1193,53 +1194,53 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
     // scripts.
     // If a witness is given, then the last value in the array should be the
     // amount (nValue) to use in the crediting tx
-    UniValue	tests = read_json(std::string(json_tests::new_ERP_scripts, json_tests::new_ERP_scripts + \
-						sizeof(json_tests::new_ERP_scripts)));
+    UniValue    tests = read_json(std::string(json_tests::new_ERP_scripts, json_tests::new_ERP_scripts + \
+                            sizeof(json_tests::new_ERP_scripts)));
 	std::size_t	count = 0;
 
 #ifdef BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
-	// Old parser
-	std::string	unlockScriptToken = "\"script\":";
-	std::string lockScriptToken = "\"lockScript\":";
-	std::string delimiter = "\",";
+    // Old parser
+    std::string	unlockScriptToken = "\"script\":";
+    std::string lockScriptToken = "\"lockScript\":";
+    std::string delimiter = "\",";
 
-	std::size_t foundUnlockScript = 0;
-	std::size_t foundLockScript = 0;
-	size_t		pos = 0;
-	int			num = 0;
+    std::size_t foundUnlockScript = 0;
+    std::size_t foundLockScript = 0;
+    size_t      pos = 0;
+    int         num = 0;
 
-	while ((foundUnlockScript != std::string::npos) && (foundLockScript != std::string::npos)) {
-		std::string unlockScript;
-		std::string lockScript;
-		std::size_t len;
-		std::size_t offset;
+    while ((foundUnlockScript != std::string::npos) && (foundLockScript != std::string::npos)) {
+        std::string unlockScript;
+        std::string lockScript;
+        std::size_t len;
+        std::size_t offset;
 
-		foundUnlockScript = input.find(unlockScriptToken, pos);
-		pos = foundUnlockScript + unlockScriptToken.length();
-		foundLockScript = input.find(lockScriptToken, pos);
-		pos = foundLockScript + lockScriptToken.length();
+        foundUnlockScript = input.find(unlockScriptToken, pos);
+        pos = foundUnlockScript + unlockScriptToken.length();
+        foundLockScript = input.find(lockScriptToken, pos);
+        pos = foundLockScript + lockScriptToken.length();
 
-		if (foundUnlockScript != std::string::npos) {
-			offset = foundUnlockScript + unlockScriptToken.length() + 1;
-			pos = input.find(delimiter, offset);
-			len = pos - offset;
-			unlockScript = input.substr(offset, len);
+        if (foundUnlockScript != std::string::npos) {
+            offset = foundUnlockScript + unlockScriptToken.length() + 1;
+            pos = input.find(delimiter, offset);
+            len = pos - offset;
+            unlockScript = input.substr(offset, len);
 
-			scripts.push_back(unlockScript);
-		}
-		if (foundLockScript != std::string::npos) {
-			offset = foundLockScript + lockScriptToken.length() + 1;
-			pos = input.find(delimiter, offset);
-			len = pos - offset;
-			lockScript = input.substr(offset, len);
+            scripts.push_back(unlockScript);
+        }
+        if (foundLockScript != std::string::npos) {
+            offset = foundLockScript + lockScriptToken.length() + 1;
+            pos = input.find(delimiter, offset);
+            len = pos - offset;
+            lockScript = input.substr(offset, len);
 
-			scripts.push_back(lockScript);
-		}
+            scripts.push_back(lockScript);
+        }
 
-		PRINT_SCRIPTS_SUMMARY(unlockScript, lockScript);
+        PRINT_SCRIPTS_SUMMARY(unlockScript, lockScript);
 
-		num++;
-	}
+        num++;
+    }
 #else
     for (unsigned int idx = 0; idx < tests.size(); idx++) {
         const UniValue& test = tests[idx];
@@ -1249,10 +1250,11 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
         CAmount nValue = 0;
         unsigned int pos = 0;
 
-		count++;
+        count++;
 
         if (test.size() > 0 && test[pos].isArray()) {
-            unsigned int i=0;
+            unsigned int i = 0;
+
             for (i = 0; i < test[pos].size()-1; i++) {
                 witness.stack.push_back(ParseHex(test[pos][i].get_str()));
 				strWitness = test[pos][i].get_str();
@@ -1275,37 +1277,37 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
         CScript scriptPubKey = ParseScript(scriptPubKeyString);
 
 #ifdef DEBUG_LOG_LEVEL
-		std::string strScriptflags = test[pos].get_str();
+        std::string strScriptflags = test[pos].get_str();
         unsigned int scriptflags = ParseScriptFlags(test[pos++].get_str());
 
-		std::string strScriptError = test[pos].get_str();
+        std::string strScriptError = test[pos].get_str();
         int scriptError = ParseScriptError(test[pos++].get_str());
 
-		// BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
-		std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
-		std::cout << std::endl;
-		std::cout << "JSON INPUT" << std::endl << std::endl;
-		std::cout << "amount :: " << nValue << std::endl;
-		std::cout << "witness :: " << strWitness << std::endl;
-		std::cout << "scriptSig :: " << scriptSigString << std::endl;
-		std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
-		std::cout << "flags :: " << strScriptflags << " | " << scriptflags << std::endl;
-		std::cout << "error :: " << strScriptError << " | " << scriptError << std::endl;
-		std::cout << std::endl;
+        // BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
+        std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
+        std::cout << std::endl;
+        std::cout << "JSON INPUT" << std::endl << std::endl;
+        std::cout << "amount :: " << nValue << std::endl;
+        std::cout << "witness :: " << strWitness << std::endl;
+        std::cout << "scriptSig :: " << scriptSigString << std::endl;
+        std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
+        std::cout << "flags :: " << strScriptflags << " | " << scriptflags << std::endl;
+        std::cout << "error :: " << strScriptError << " | " << scriptError << std::endl;
+        std::cout << std::endl;
 #endif
 
-		if (scriptPubKey.GetSigOpCount(scriptSig) > MAX_P2SH_SIGOPS) {
-			std::vector<std::vector<unsigned char> > directStack;
-			ScriptError err;
+        if (scriptPubKey.GetSigOpCount(scriptSig) > MAX_P2SH_SIGOPS) {
+            std::vector<std::vector<unsigned char> > directStack;
+            ScriptError err;
 
-			PRINT_SCRIPTS_SUMMARY(scriptSig, scriptPubKey);
+            PRINT_SCRIPTS_SUMMARY(scriptSig, scriptPubKey);
 
-			EvalScript(directStack, scriptSig, SCRIPT_VERIFY_P2SH, BaseSignatureChecker(), SigVersion::BASE, &err);
-			if (err != SCRIPT_ERR_OK)
-				std::cout << "[!!!] Invalid script: " << ScriptErrorString(err) << std::endl;
-		}
+            EvalScript(directStack, scriptSig, SCRIPT_VERIFY_P2SH, BaseSignatureChecker(), SigVersion::BASE, &err);
+            if (err != SCRIPT_ERR_OK)
+                std::cout << "[!!!] Invalid script: " << ScriptErrorString(err) << std::endl;
+        }
 
-		BOOST_CHECK(scriptPubKey.GetSigOpCount(scriptSig) < MAX_P2SH_SIGOPS);
+        BOOST_CHECK(scriptPubKey.GetSigOpCount(scriptSig) < MAX_P2SH_SIGOPS);
     }
 #endif //BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
 }
@@ -1326,52 +1328,52 @@ BOOST_AUTO_TEST_CASE(script_pegfix_overflow)
     // If a witness is given, then the last value in the array should be the
     // amount (nValue) to use in the crediting tx
     UniValue tests = read_json(std::string(json_tests::pegfix_overflow_scripts, json_tests::pegfix_overflow_scripts + \
-								sizeof(json_tests::pegfix_overflow_scripts)));
-	std::size_t count = 0;
+                sizeof(json_tests::pegfix_overflow_scripts)));
+    std::size_t count = 0;
 
 #ifdef BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
-	// Old parser
-	std::string	unlockScriptToken = "\"script\":";
-	std::string lockScriptToken = "\"lockScript\":";
-	std::string delimiter = "\",";
+    // Old parser
+    std::string	unlockScriptToken = "\"script\":";
+    std::string lockScriptToken = "\"lockScript\":";
+    std::string delimiter = "\",";
 
-	std::size_t foundUnlockScript = 0;
-	std::size_t foundLockScript = 0;
-	size_t		pos = 0;
-	int			num = 0;
+    std::size_t foundUnlockScript = 0;
+    std::size_t foundLockScript = 0;
+    size_t      pos = 0;
+    int         num = 0;
 
-	while ((foundUnlockScript != std::string::npos) && (foundLockScript != std::string::npos)) {
-		std::string unlockScript;
-		std::string lockScript;
-		std::size_t len;
-		std::size_t offset;
+    while ((foundUnlockScript != std::string::npos) && (foundLockScript != std::string::npos)) {
+        std::string unlockScript;
+        std::string lockScript;
+        std::size_t len;
+        std::size_t offset;
 
-		foundUnlockScript = input.find(unlockScriptToken, pos);
-		pos = foundUnlockScript + unlockScriptToken.length();
-		foundLockScript = input.find(lockScriptToken, pos);
-		pos = foundLockScript + lockScriptToken.length();
+        foundUnlockScript = input.find(unlockScriptToken, pos);
+        pos = foundUnlockScript + unlockScriptToken.length();
+        foundLockScript = input.find(lockScriptToken, pos);
+        pos = foundLockScript + lockScriptToken.length();
 
-		if (foundUnlockScript != std::string::npos) {
-			offset = foundUnlockScript + unlockScriptToken.length() + 1;
-			pos = input.find(delimiter, offset);
-			len = pos - offset;
-			unlockScript = input.substr(offset, len);
+        if (foundUnlockScript != std::string::npos) {
+            offset = foundUnlockScript + unlockScriptToken.length() + 1;
+            pos = input.find(delimiter, offset);
+            len = pos - offset;
+            unlockScript = input.substr(offset, len);
 
-			scripts.push_back(unlockScript);
-		}
-		if (foundLockScript != std::string::npos) {
-			offset = foundLockScript + lockScriptToken.length() + 1;
-			pos = input.find(delimiter, offset);
-			len = pos - offset;
-			lockScript = input.substr(offset, len);
+            scripts.push_back(unlockScript);
+        }
+        if (foundLockScript != std::string::npos) {
+            offset = foundLockScript + lockScriptToken.length() + 1;
+            pos = input.find(delimiter, offset);
+            len = pos - offset;
+            lockScript = input.substr(offset, len);
 
-			scripts.push_back(lockScript);
-		}
+            scripts.push_back(lockScript);
+        }
 
-		PRINT_SCRIPTS_SUMMARY(unlockScript, lockScript);
+        PRINT_SCRIPTS_SUMMARY(unlockScript, lockScript);
 
-		num++;
-	}
+        num++;
+    }
 #else
     for (unsigned int idx = 0; idx < tests.size(); idx++) {
         const UniValue& test = tests[idx];
@@ -1381,13 +1383,14 @@ BOOST_AUTO_TEST_CASE(script_pegfix_overflow)
         CAmount nValue = 0;
         unsigned int pos = 0;
 
-		count++;
+        count++;
 
         if (test.size() > 0 && test[pos].isArray()) {
-            unsigned int i=0;
+            unsigned int i = 0;
+
             for (i = 0; i < test[pos].size()-1; i++) {
                 witness.stack.push_back(ParseHex(test[pos][i].get_str()));
-				strWitness = test[pos][i].get_str();
+                strWitness = test[pos][i].get_str();
             }
             nValue = AmountFromValue(test[pos][i]);
             pos++;
@@ -1407,37 +1410,37 @@ BOOST_AUTO_TEST_CASE(script_pegfix_overflow)
         CScript scriptPubKey = ParseScript(scriptPubKeyString);
 
 #ifdef DEBUG_LOG_LEVEL
-		std::string strScriptflags = test[pos].get_str();
+        std::string strScriptflags = test[pos].get_str();
         unsigned int scriptflags = ParseScriptFlags(test[pos++].get_str());
 
-		std::string strScriptError = test[pos].get_str();
+        std::string strScriptError = test[pos].get_str();
         int scriptError = ParseScriptError(test[pos++].get_str());
 
-		// BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
-		std::cout << "[" << count << "] " << "==============================================" << std::endl;
-		std::cout << std::endl;
-		std::cout << "JSON INPUT" << std::endl << std::endl;
-		std::cout << "amount :: " << nValue << std::endl;
-		std::cout << "witness :: " << strWitness << std::endl;
-		std::cout << "scriptSig :: " << scriptSigString << std::endl;
-		std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
-		std::cout << "flags :: " << strScriptflags << " | " << scriptflags << std::endl;
-		std::cout << "error :: " << strScriptError << " | " << scriptError << std::endl;
-		std::cout << std::endl;
+        // BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
+        std::cout << "[" << count << "] " << "==============================================" << std::endl;
+        std::cout << std::endl;
+        std::cout << "JSON INPUT" << std::endl << std::endl;
+        std::cout << "amount :: " << nValue << std::endl;
+        std::cout << "witness :: " << strWitness << std::endl;
+        std::cout << "scriptSig :: " << scriptSigString << std::endl;
+        std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
+        std::cout << "flags :: " << strScriptflags << " | " << scriptflags << std::endl;
+        std::cout << "error :: " << strScriptError << " | " << scriptError << std::endl;
+        std::cout << std::endl;
 #endif
-		if ((int) scriptSig.GetStandardSigOpCount() < 0) {
-			std::vector<std::vector<unsigned char> > directStack;
-			ScriptError err;
+        if ((int) scriptSig.GetStandardSigOpCount() < 0) {
+            std::vector<std::vector<unsigned char> > directStack;
+            ScriptError err;
 
-			PRINT_SCRIPTS_SUMMARY(scriptSig, scriptPubKey);
+            PRINT_SCRIPTS_SUMMARY(scriptSig, scriptPubKey);
 
-			EvalScript(directStack, scriptSig, SCRIPT_VERIFY_P2SH, BaseSignatureChecker(), SigVersion::BASE, &err);
-			if (err == SCRIPT_ERR_OK)
-				std::cout << "[!!!] Valid script" << std::endl;
+            EvalScript(directStack, scriptSig, SCRIPT_VERIFY_P2SH, BaseSignatureChecker(), SigVersion::BASE, &err);
+            if (err == SCRIPT_ERR_OK)
+                std::cout << "[!!!] Valid script" << std::endl;
 
-			BOOST_CHECK_MESSAGE(err != SCRIPT_ERR_OK, ScriptErrorString(err));
-		}
-		BOOST_CHECK((int) scriptSig.GetStandardSigOpCount() >= 0);
+            BOOST_CHECK_MESSAGE(err != SCRIPT_ERR_OK, ScriptErrorString(err));
+        }
+        BOOST_CHECK((int) scriptSig.GetStandardSigOpCount() >= 0);
     }
 #endif //BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
 }
