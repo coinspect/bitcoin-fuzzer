@@ -8,7 +8,9 @@ ARG UNITTESTS_PACKAGES="build-essential libtool autotools-dev automake pkg-confi
 
 ARG OPTIONAL_PACKAGES="vim zsh"
 ARG BITCOIN_PATH="/usr/src/bitcoin"
+ARG BITCOIN_INPUT_DATA="/usr/src/bitcoin/src/test/data"
 ARG COINSPECT_PACKAGE="coinspect-bitcoin-fuzzer"
+ARG COINSPECT_INPUT_DATA="input"
 
 ARG arg
 RUN	apt-get update && \
@@ -25,6 +27,7 @@ RUN	apt-get update && \
 	git clone https://github.com/bitcoin/bitcoin.git
 
 COPY $COINSPECT_PACKAGE/ $BITCOIN_PATH
+COPY $COINSPECT_INPUT_DATA $BITCOIN_INPUT_DATA
 
 RUN	cd $BITCOIN_PATH && \
 	./autogen.sh && \
