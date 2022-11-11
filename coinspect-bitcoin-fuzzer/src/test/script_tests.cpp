@@ -6,9 +6,9 @@
 #include <test/data/bip341_wallet_vectors.json.h>
 
 #include <test/data/deprecated_ERP_scripts.json.h>
-#include <test/data/new_ERP_scripts.json>
-#include <test/data/scripts_fastbridge.json>
-#include <test/data/pegfix_overflow_scripts.json>
+#include <test/data/new_ERP_scripts.json.h>
+#include <test/data/scripts_fastbridge.json.h>
+#include <test/data/pegfix_overflow_scripts.json.h>
 
 #include <core_io.h>
 #include <fs.h>
