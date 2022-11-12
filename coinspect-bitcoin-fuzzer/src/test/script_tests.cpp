@@ -1079,8 +1079,8 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
 
     std::size_t foundUnlockScript = 0;
     std::size_t foundLockScript = 0;
-    size_t		pos = 0;
-    int			num = 0;
+    size_t      pos = 0;
+    int         num = 0;
 
     while ((foundUnlockScript != std::string::npos) && (foundLockScript != std::string::npos)) {
         std::string unlockScript;
@@ -1119,7 +1119,7 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
         const UniValue& test = tests[idx];
         std::string strTest = test.write();
         CScriptWitness witness;
-		std::string strWitness;
+        std::string strWitness;
         CAmount nValue = 0;
         unsigned int pos = 0;
 
@@ -1153,7 +1153,7 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
         std::string strScriptflags = test[pos].get_str();
         unsigned int scriptflags = ParseScriptFlags(test[pos++].get_str());
 
-		std::string strScriptError = test[pos].get_str();
+        std::string strScriptError = test[pos].get_str();
         int scriptError = ParseScriptError(test[pos++].get_str());
 
         // BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
@@ -1196,7 +1196,7 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
     // amount (nValue) to use in the crediting tx
     UniValue    tests = read_json(std::string(json_tests::new_ERP_scripts, json_tests::new_ERP_scripts + \
                             sizeof(json_tests::new_ERP_scripts)));
-	std::size_t	count = 0;
+    std::size_t	count = 0;
 
 #ifdef BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
     // Old parser
@@ -1246,7 +1246,7 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
         const UniValue& test = tests[idx];
         std::string strTest = test.write();
         CScriptWitness witness;
-		std::string strWitness;
+        std::string strWitness;
         CAmount nValue = 0;
         unsigned int pos = 0;
 
