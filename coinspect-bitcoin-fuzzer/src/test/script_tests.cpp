@@ -1120,7 +1120,6 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
         std::string strTest = test.write();
         CScriptWitness witness;
         std::string strWitness;
-        CAmount nValue = 0;
         unsigned int pos = 0;
 
         count++;
@@ -1132,7 +1131,6 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
                 witness.stack.push_back(ParseHex(test[pos][i].get_str()));
                 strWitness = test[pos][i].get_str();
             }
-            nValue = AmountFromValue(test[pos][i]);
             pos++;
         }
         if (test.size() < 4 + pos) // Allow size > 3; extra stuff ignored (useful for comments)
@@ -1160,7 +1158,6 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
         std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
         std::cout << std::endl;
         std::cout << "JSON INPUT" << std::endl << std::endl;
-        std::cout << "amount :: " << nValue << std::endl;
         std::cout << "witness :: " << strWitness << std::endl;
         std::cout << "scriptSig :: " << scriptSigString << std::endl;
         std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
@@ -1247,7 +1244,6 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
         std::string strTest = test.write();
         CScriptWitness witness;
         std::string strWitness;
-        CAmount nValue = 0;
         unsigned int pos = 0;
 
         count++;
@@ -1259,7 +1255,6 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
                 witness.stack.push_back(ParseHex(test[pos][i].get_str()));
 				strWitness = test[pos][i].get_str();
             }
-            nValue = AmountFromValue(test[pos][i]);
             pos++;
         }
         if (test.size() < 4 + pos) // Allow size > 3; extra stuff ignored (useful for comments)
@@ -1287,7 +1282,6 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
         std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
         std::cout << std::endl;
         std::cout << "JSON INPUT" << std::endl << std::endl;
-        std::cout << "amount :: " << nValue << std::endl;
         std::cout << "witness :: " << strWitness << std::endl;
         std::cout << "scriptSig :: " << scriptSigString << std::endl;
         std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
@@ -1380,7 +1374,6 @@ BOOST_AUTO_TEST_CASE(script_pegfix_overflow)
         std::string strTest = test.write();
         CScriptWitness witness;
 		std::string strWitness;
-        CAmount nValue = 0;
         unsigned int pos = 0;
 
         count++;
@@ -1392,7 +1385,6 @@ BOOST_AUTO_TEST_CASE(script_pegfix_overflow)
                 witness.stack.push_back(ParseHex(test[pos][i].get_str()));
                 strWitness = test[pos][i].get_str();
             }
-            nValue = AmountFromValue(test[pos][i]);
             pos++;
         }
         if (test.size() < 4 + pos) // Allow size > 3; extra stuff ignored (useful for comments)
@@ -1420,7 +1412,6 @@ BOOST_AUTO_TEST_CASE(script_pegfix_overflow)
         std::cout << "[" << count << "] " << "==============================================" << std::endl;
         std::cout << std::endl;
         std::cout << "JSON INPUT" << std::endl << std::endl;
-        std::cout << "amount :: " << nValue << std::endl;
         std::cout << "witness :: " << strWitness << std::endl;
         std::cout << "scriptSig :: " << scriptSigString << std::endl;
         std::cout << "scriptPubKey :: " << scriptPubKeyString << std::endl;
