@@ -34,8 +34,10 @@ RUN	cd $BITCOIN_PATH && \
 	if [ "$arg"  = "tests" ] ; then \
 		./configure && \
 		make -C src/test -j "$(($(nproc)+1))"; \
+        src/test/test_bitcoin --run_test=script_tests
 	elif [ "$arg"  = "fuzzer" ] ; then \
 		CC=clang CXX=clang++ ./configure --enable-fuzz --with-sanitizers=address,fuzzer,undefined,signed-integer-overflow,unsigned-integer-overflow && \
 		make -j "$(($(nproc)+1))"; \
+        test/fuzz/test-runner.py --corpus_dir test/fuzz/json-input --target script
 	fi
 
