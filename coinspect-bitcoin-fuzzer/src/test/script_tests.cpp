@@ -1166,7 +1166,7 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
         std::cout << std::endl;
 #endif
 
-        if (scriptPubKey.GetSigOpCount(scriptSig) > MAX_P2SH_SIGOPS) {
+        if (scriptPubKey.GetSigOpCount(scriptSig) < MAX_P2SH_SIGOPS) {
             std::vector<std::vector<unsigned char> > directStack;
             ScriptError err;
 
@@ -1177,7 +1177,7 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
                 std::cout << "[!!!] Invalid script: " << ScriptErrorString(err) << std::endl;
         }
 
-        BOOST_CHECK(scriptPubKey.GetSigOpCount(scriptSig) < MAX_P2SH_SIGOPS);
+        BOOST_CHECK(scriptPubKey.GetSigOpCount(scriptSig) > MAX_P2SH_SIGOPS);
     }
 #endif //BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
 }
@@ -1373,7 +1373,7 @@ BOOST_AUTO_TEST_CASE(script_pegfix_overflow)
         const UniValue& test = tests[idx];
         std::string strTest = test.write();
         CScriptWitness witness;
-		std::string strWitness;
+        std::string strWitness;
         unsigned int pos = 0;
 
         count++;
