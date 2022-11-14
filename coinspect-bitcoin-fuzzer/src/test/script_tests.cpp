@@ -1301,7 +1301,7 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
                 std::cout << "[!!!] Invalid script: " << ScriptErrorString(err) << std::endl;
         }
 
-        BOOST_CHECK(scriptPubKey.GetSigOpCount(scriptSig) < MAX_P2SH_SIGOPS);
+        BOOST_CHECK(scriptPubKey.GetSigOpCount(scriptSig) <= MAX_P2SH_SIGOPS);
     }
 #endif //BITCOIN_FUZZER_USE_OLD_JSON_PASRSER
 }
