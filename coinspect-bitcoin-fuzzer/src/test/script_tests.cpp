@@ -45,7 +45,7 @@
 #define UPDATE_JSON_TESTS
 
 // Uncomment if you want debug messages displayed
-//#define DEBUG_LOG_LEVEL
+#define DEBUG_LOG_LEVEL
 
 // Uncomment if you want to test pegfix parser patch
 //#define PEGFIX_PATCH
@@ -1155,7 +1155,7 @@ BOOST_AUTO_TEST_CASE(deprecated_ERP_scripts)
         int scriptError = ParseScriptError(test[pos++].get_str());
 
         // BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
-        std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
+        std::cout << "[" << count << "] " << "==============================================" << std::endl;
         std::cout << std::endl;
         std::cout << "JSON INPUT" << std::endl << std::endl;
         std::cout << "witness :: " << strWitness << std::endl;
@@ -1279,7 +1279,7 @@ BOOST_AUTO_TEST_CASE(new_ERP_scripts)
         int scriptError = ParseScriptError(test[pos++].get_str());
 
         // BITCOIN-FUZZER: Printing parsed data for user's clarity. Can be removed in the future.
-        std::cout << "[" << count++ << "] " << "==============================================" << std::endl;
+        std::cout << "[" << count << "] " << "==============================================" << std::endl;
         std::cout << std::endl;
         std::cout << "JSON INPUT" << std::endl << std::endl;
         std::cout << "witness :: " << strWitness << std::endl;

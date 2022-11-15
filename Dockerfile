@@ -11,6 +11,7 @@ ARG BITCOIN_PATH="/usr/src/bitcoin"
 ARG BITCOIN_INPUT_DATA="/usr/src/bitcoin/src/test/data"
 ARG COINSPECT_PACKAGE="coinspect-bitcoin-fuzzer"
 ARG COINSPECT_INPUT_DATA="input"
+ARG COINSPECT_INPUT_FILES="deprecated_ERP_scripts.json new_ERP_scripts.json pegfix_overflow_scripts.json scripts_fastbridge.json"
 
 ARG arg
 RUN	apt-get update && \
@@ -26,17 +27,36 @@ RUN	apt-get update && \
 	cd /usr/src/ && \
 	git clone https://github.com/bitcoin/bitcoin.git
 
-COPY $COINSPECT_PACKAGE/ $BITCOIN_PATH
-COPY $COINSPECT_INPUT_DATA $BITCOIN_INPUT_DATA
+COPY $COINSPECT_PACKAGE/src/Makefile.test.include $BITCOIN_PATH/src
+WORKDIR $BITCOIN_INPUT_DATA
+RUN touch $COINSPECT_INPUT_FILES
 
 RUN	cd $BITCOIN_PATH && \
 	./autogen.sh && \
 	if [ "$arg"  = "tests" ] ; then \
-		./configure && \
+		./configure; \
+	elif [ "$arg"  = "fuzzer" ] ; then \
+		CC=clang CXX=clang++ ./configure --enable-fuzz --with-sanitizers=address,fuzzer,undefined,signed-integer-overflow,unsigned-integer-overflow; \
+	fi
+
+	RUN cd $BITCOIN_PATH && \
+	if [ "$arg"  = "tests" ] ; then \
+		make -C src/test -j "$(($(nproc)+1))"; \
+	elif [ "$arg"  = "fuzzer" ] ; then \
+		make -j "$(($(nproc)+1))"; \
+	fi
+
+WORKDIR $BITCOIN_INPUT_DATA
+RUN rm *.h
+
+COPY $COINSPECT_PACKAGE $BITCOIN_PATH
+COPY $COINSPECT_INPUT_DATA $BITCOIN_INPUT_DATA
+
+RUN cd $BITCOIN_PATH && \
+	if [ "$arg"  = "tests" ] ; then \
 		make -C src/test -j "$(($(nproc)+1))"; \
         src/test/test_bitcoin --run_test=script_tests; \
 	elif [ "$arg"  = "fuzzer" ] ; then \
-		CC=clang CXX=clang++ ./configure --enable-fuzz --with-sanitizers=address,fuzzer,undefined,signed-integer-overflow,unsigned-integer-overflow && \
 		make -j "$(($(nproc)+1))"; \
         test/fuzz/test-runner.py --corpus_dir test/fuzz/json-input --target script; \
 	fi
