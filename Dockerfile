@@ -46,6 +46,9 @@ RUN cd $BITCOIN_PATH && \
         make -j "$(($(nproc)+1))"; \
     fi
 
+# If we modify .cpp's or inputs.json, Docker cache will invalidate those individual files.
+# However, build process will not see that the source files have been changed, so we need to force
+# a removal of either object files or JSON generated headers in order to have our test cases rebuilt.
 WORKDIR $BITCOIN_INPUT_DATA
 RUN rm *.h
 
