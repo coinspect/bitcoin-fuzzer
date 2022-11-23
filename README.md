@@ -28,7 +28,7 @@ $ git clone https://github.com/coinspect/bitcoin-fuzzer
 $ cd bitcoin-fuzzer
 # Optionally, add/modify input data sets of your choice into inputs/
 # Build it
-$ docker build -t bitcoin-fuzzer . --build-arg arg={'tests','fuzzer'}
+$ docker build -t bitcoin-{'test','fuzzer'} . --build-arg arg={'tests','fuzzer'}
 # You can re-run the test cases, for example "script_test"
 $ docker run bitcoin-test /usr/src/bitcoin/src/test/test_bitcoin --run_test=script_test
 # Or fuzzing harnesses
