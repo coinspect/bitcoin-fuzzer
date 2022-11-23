@@ -19,7 +19,7 @@ Bitcoin-fuzzer is split in three key components
 2. [Unit tests](https://github.com/bitcoin/bitcoin/tree/master/src/test/) and modified [fuzzing harnesses](https://github.com/bitcoin/bitcoin/tree/master/src/test/fuzz)
 3. [Input data](https://github.com/bitcoin/bitcoin/tree/master/src/test/data)
 
-Notice that the original fuzzing [seed input](https://github.com/bitcoin-core/qa-assets) containing unstructured data is replaced with well-formed JSONs. This allows better coverage and more intelligent testing.
+Notice that the original fuzz [seed input](https://github.com/bitcoin-core/qa-assets), containing unstructured data, is replaced with well-formed JSONs. This allows for better coverage and more intelligent testing.
 
 ## Usage
 
