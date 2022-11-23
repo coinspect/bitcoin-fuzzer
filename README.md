@@ -30,12 +30,12 @@ $ cd bitcoin-fuzzer
 # Optionally, add/modify input data sets of your choice into inputs/
 # Build it
 $ docker build -t bitcoin-{'test','fuzzer'} . --build-arg arg={'tests','fuzzer'}
-# You can re-run the test cases, for example "script_test"
+# You can re-run the cases, for example, script tests:
 $ docker run bitcoin-test /usr/src/bitcoin/src/test/test_bitcoin --run_test=script_test
 # Or fuzzing harnesses
 $ docker run bitcoin-fuzzer /usr/src/bitcoin/test/fuzz/test-runner.py --corpus_dir /inputs --target script
 
 ```
-If you want to modify the currently existent tests, or add new cases, edit the C++ modules and rebuild the image. The same procedure can be performed to change or add new input data: make the necessary changes to inputs and rebuild the Docker image.
+If you want to modify the currently existent tests or add new cases, edit the C++ modules and rebuild the image. The same procedure can be performed to change or add new input data.
 
 If new input data or test case modules are added, update the [Makefile](https://github.com/coinspect/bitcoin-fuzzer/blob/master/coinspect-bitcoin-fuzzer/src/Makefile.test.include) to reflect the changes, then rebuild.
