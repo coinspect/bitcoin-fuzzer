@@ -10,9 +10,10 @@ Bitcoin-fuzzer is a modified version of the Bitcoin core unit tests framework wi
 * Bitcoin-tests ("tests"), allowing to execute the original Bitcoin unit tests + Bitcoin-fuzzer's additional cases
 * Bitcoin-fuzzer ("fuzzer"), allowing to execute the original Bitcoin fuzzing harnesses + Bitcoin-fuzzer's additional cases
 
-It can work as a stand-alone framework or interface with other tools, such as [Coinspect SRK](https://github.com/coinspect/srk). Bitcoin-fuzzer comes with the extensive collection of tests and input data from the Bitcoin repository, with addition to:
+It can work as a stand-alone framework or interface with other tools, such as [Coinspect SRK](https://github.com/coinspect/srk), for automated input generation. Bitcoin-fuzzer comes with the extensive collection of tests and input data from the Bitcoin repository, with the following additions:
 * Special test cases to RSK
-* A unified interface to receive inputs from JSON files, working for both Bitcoin unit tests and Libfuzzer harnesseses.
+* A unified interface to receive inputs from JSON files, working for both Bitcoin unit tests and Libfuzzer harnesseses
+* A "type-aware" Libfuzzer interface that will respect the Bitcoin objects structure, fuzzing JSON fields accordingly
 
 Bitcoin-fuzzer is split in three key components
 1. A Dockerfile to create the test environment
@@ -36,3 +37,5 @@ $ docker run bitcoin-fuzzer /usr/src/bitcoin/test/fuzz/test-runner.py --corpus_d
 
 ```
 If you want to modify the currently existent tests, or add new cases, edit the C++ modules and rebuild the image. The same procedure can be performed to change or add new input data: make the necessary changes to inputs and rebuild the Docker image.
+
+If new input data or test case modules are added, update the [Makefile](https://github.com/coinspect/bitcoin-fuzzer/blob/master/coinspect-bitcoin-fuzzer/src/Makefile.test.include) to reflect the changes, then rebuild.
